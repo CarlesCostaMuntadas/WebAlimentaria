@@ -10,16 +10,20 @@ const currentMonthName = MESOS_NOM[new Date().getMonth()];
 let currentTipologia = 'tots';
 let searchTerm = '';
 let selectedMonths = [currentMonthName];
-let selectedColor = '#b6d7a8'; // Per defecte seleccionar color verd (alta proximitat)
+let selectedColor = '#b6d7a8';
 let currentPage = 1;
 let itemsPerPage = 24;
 let isAdmin = false;
 let allAliments = [];
 
+let activeModalImages = [];
+let activeModalIndex = 0;
+let selectedFormColor = '#b6d7a8'; // Color seleccionat al formulari d'edició/creació
+
 // Elements DOM
 const gridEl = document.getElementById('aliments-grid');
 const searchInput = document.getElementById('search-input');
-const tabBtns = document.querySelectorAll('.tab-btn');
+const categoriesNav = document.getElementById('categories-nav');
 const adminLoginBtn = document.getElementById('btn-admin-login-discreet');
 const adminLogoutBtn = document.getElementById('btn-admin-logout');
 const adminPanel = document.getElementById('admin-panel');
@@ -27,7 +31,6 @@ const loginModal = document.getElementById('login-modal');
 const closeModal = document.getElementById('close-modal');
 const loginForm = document.getElementById('login-form');
 
-// Elements Modal CRUD
 const alimentModal = document.getElementById('aliment-modal');
 const closeAlimentModal = document.getElementById('close-aliment-modal');
 const alimentForm = document.getElementById('aliment-form');
@@ -36,18 +39,23 @@ const alimentModalTitle = document.getElementById('aliment-modal-title');
 const imageInputsContainer = document.getElementById('image-inputs-container');
 const btnAddImageField = document.getElementById('btn-add-image-field');
 
-// Modal Imatge Gran
+const customPartInput = document.getElementById('custom-part-input');
+const btnAddCustomPart = document.getElementById('btn-add-custom-part');
+const customConsumInput = document.getElementById('custom-consum-input');
+const btnAddCustomConsum = document.getElementById('btn-add-custom-consum');
+
 const imageModal = document.getElementById('image-modal');
 const modalImgPreview = document.getElementById('modal-img-preview');
+const modalPrevBtn = document.getElementById('modal-prev-btn');
+const modalNextBtn = document.getElementById('modal-next-btn');
+const modalImgCounter = document.getElementById('modal-img-counter');
 
-// Desplegable mesos
 const monthsToggleBtn = document.getElementById('months-toggle-btn');
 const monthsMenu = document.getElementById('months-menu');
 const checkAllMonths = document.getElementById('check-all-months');
 const monthCheckboxes = document.querySelectorAll('.month-check');
 const selectedMonthsCountSpan = document.getElementById('selected-months-count');
 
-// Paginador
 const itemsPerPageSelect = document.getElementById('items-per-page');
 const btnPrevPage = document.getElementById('btn-prev-page');
 const btnNextPage = document.getElementById('btn-next-page');
@@ -64,17 +72,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         applyFiltersAndRender();
     });
 
-    tabBtns.forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            tabBtns.forEach(b => b.classList.remove('active'));
-            e.target.classList.add('active');
-            currentTipologia = e.target.getAttribute('data-tipologia');
-            currentPage = 1;
-            updateDynamicTitles();
-            applyFiltersAndRender();
-        });
-    });
-
     document.querySelectorAll('.color-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
             document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('active'));
@@ -82,6 +79,15 @@ document.addEventListener('DOMContentLoaded', async () => {
             selectedColor = e.target.getAttribute('data-color');
             currentPage = 1;
             applyFiltersAndRender();
+        });
+    });
+
+    // Gestió del selector net de color al formulari
+    document.querySelectorAll('.color-option-circle').forEach(circle => {
+        circle.addEventListener('click', (e) => {
+            document.querySelectorAll('.color-option-circle').forEach(c => c.classList.remove('active'));
+            e.target.classList.add('active');
+            selectedFormColor = e.target.getAttribute('data-color');
         });
     });
 
@@ -127,9 +133,36 @@ document.addEventListener('DOMContentLoaded', async () => {
     alimentForm.addEventListener('submit', handleAlimentFormSubmit);
     btnAddImageField.addEventListener('click', () => addImageInputField(''));
 
+    btnAddCustomPart.addEventListener('click', () => {
+        const val = customPartInput.value.trim();
+        if (val) { addChipOption('parts-checkboxes', val, true); customPartInput.value = ''; }
+    });
+
+    btnAddCustomConsum.addEventListener('click', () => {
+        const val = customConsumInput.value.trim();
+        if (val) { addChipOption('consum-checkboxes', val, true); customConsumInput.value = ''; }
+    });
+
     document.getElementById('btn-massiu-publicar').addEventListener('click', () => updateTipologiaStatus(currentTipologia, true));
     document.getElementById('btn-massiu-despublicar').addEventListener('click', () => updateTipologiaStatus(currentTipologia, false));
 });
+
+function addChipOption(containerId, value, check = false) {
+    const container = document.getElementById(containerId);
+    const exists = Array.from(container.querySelectorAll('input')).some(i => i.value.toLowerCase() === value.toLowerCase());
+    if (exists) {
+        if (check) {
+            const match = Array.from(container.querySelectorAll('input')).find(i => i.value.toLowerCase() === value.toLowerCase());
+            if (match) match.checked = true;
+        }
+        return;
+    }
+
+    const label = document.createElement('label');
+    label.className = 'chip-checkbox';
+    label.innerHTML = `<input type="checkbox" value="${value}" ${check ? 'checked' : ''}><span>${value}</span>`;
+    container.appendChild(label);
+}
 
 function showToast(message, type = 'success') {
     const container = document.getElementById('toast-container');
@@ -193,43 +226,51 @@ async function fetchAliments() {
         return;
     }
     allAliments = data;
-    updateDynamicTitles();
+    buildDynamicNavAndTitles();
     applyFiltersAndRender();
 }
 
-// Actualitza títols, subtítols i comptadors segons les dades reals de la BBDD
-function updateDynamicTitles() {
-    const mainTitle = document.getElementById('main-title');
-    const mainSubtitle = document.getElementById('main-subtitle');
-
-    // Comptadors per tipologia
+function buildDynamicNavAndTitles() {
     const visibleAliments = isAdmin ? allAliments : allAliments.filter(a => a.publicat);
-    
-    const counts = {
-        tots: visibleAliments.length,
-        planta_silvestre: visibleAliments.filter(a => a.tipologia === 'planta_silvestre').length,
-        verdura: visibleAliments.filter(a => a.tipologia === 'verdura').length,
-        fruita: visibleAliments.filter(a => a.tipologia === 'fruita').length,
-        peix: visibleAliments.filter(a => a.tipologia === 'peix').length,
-        marisc: visibleAliments.filter(a => a.tipologia === 'marisc').length,
-    };
 
-    for (const [key, val] of Object.entries(counts)) {
-        const span = document.getElementById(`count-${key}`);
-        if (span) span.textContent = val;
-    }
-
-    const tipologiaNoms = {
-        'tots': 'Catàleg Natural General',
+    const tipologiaLabels = {
         'planta_silvestre': 'Plantes Silvestres',
-        'verdura': 'Verdures i Hortalisses',
-        'fruita': 'Fruites de Temporada',
+        'verdura': 'Verdures',
+        'fruita': 'Fruites',
         'peix': 'Peixos',
         'marisc': 'Marisc'
     };
 
-    mainTitle.textContent = `Alimentalia - ${tipologiaNoms[currentTipologia] || 'Catàleg'}`;
-    mainSubtitle.textContent = `Mostrant ${counts[currentTipologia]} elements disponibles a la base de dades`;
+    const publishedTipologias = [...new Set(visibleAliments.map(a => a.tipologia))].filter(Boolean);
+
+    let navHtml = `<button class="tab-btn ${currentTipologia === 'tots' ? 'active' : ''}" data-tipologia="tots">Tots (${visibleAliments.length})</button>`;
+
+    publishedTipologias.forEach(key => {
+        const count = visibleAliments.filter(a => a.tipologia === key).length;
+        const label = tipologiaLabels[key] || key;
+        navHtml += `<button class="tab-btn ${currentTipologia === key ? 'active' : ''}" data-tipologia="${key}">${label} (${count})</button>`;
+    });
+
+    categoriesNav.innerHTML = navHtml;
+
+    categoriesNav.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            categoriesNav.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            e.target.classList.add('active');
+            currentTipologia = e.target.getAttribute('data-tipologia');
+            currentPage = 1;
+            updateSubtitles(publishedTipologias, tipologiaLabels);
+            applyFiltersAndRender();
+        });
+    });
+
+    updateSubtitles(publishedTipologias, tipologiaLabels);
+}
+
+function updateSubtitles(publishedTipologias, tipologiaLabels) {
+    const mainSubtitle = document.getElementById('main-subtitle');
+    const labelsList = publishedTipologias.map(t => tipologiaLabels[t] || t).join(', ');
+    mainSubtitle.textContent = labelsList ? `Catàleg de: ${labelsList}` : 'Catàleg de: (Cap tipologia publicada)';
 }
 
 function applyFiltersAndRender() {
@@ -269,8 +310,11 @@ function renderAliments(aliments) {
         let imgGalleryHtml = '';
 
         if (hasImg) {
+            const urlsArray = item.aliments_imatges.map(i => i.url);
+            const urlsJson = JSON.stringify(urlsArray).replace(/"/g, '&quot;');
+
             const slides = item.aliments_imatges.map((img, idx) => `
-                <img src="${img.url}" alt="${item.nom_comu}" class="${idx === 0 ? 'active-slide' : ''}" onclick="openImageModal('${img.url}')" onerror="this.style.display='none'">
+                <img src="${img.url}" alt="${item.nom_comu}" class="${idx === 0 ? 'active-slide' : ''}" onclick="openImageModal(${urlsJson}, ${idx})" onerror="this.style.display='none'">
             `).join('');
 
             const dots = item.aliments_imatges.length > 1 ? `
@@ -327,11 +371,35 @@ function renderAliments(aliments) {
     }).join('');
 }
 
-// Funció per obrir imatge en gran
-window.openImageModal = function(url) {
-    modalImgPreview.src = url;
+window.openImageModal = function(urls, index) {
+    activeModalImages = urls;
+    activeModalIndex = index;
+    updateModalImageDisplay();
     imageModal.classList.remove('hidden');
 };
+
+window.closeImageModal = function() {
+    imageModal.classList.add('hidden');
+};
+
+window.slideModalImage = function(direction) {
+    activeModalIndex = (activeModalIndex + direction + activeModalImages.length) % activeModalImages.length;
+    updateModalImageDisplay();
+};
+
+function updateModalImageDisplay() {
+    modalImgPreview.src = activeModalImages[activeModalIndex];
+    modalImgCounter.textContent = `${activeModalIndex + 1} / ${activeModalImages.length}`;
+    if (activeModalImages.length > 1) {
+        modalPrevBtn.style.display = 'flex';
+        modalNextBtn.style.display = 'flex';
+        modalImgCounter.style.display = 'block';
+    } else {
+        modalPrevBtn.style.display = 'none';
+        modalNextBtn.style.display = 'none';
+        modalImgCounter.style.display = 'none';
+    }
+}
 
 window.slideGallery = function(alimentId, direction) {
     const container = document.getElementById(`gallery-${alimentId}`);
@@ -375,19 +443,24 @@ window.openAlimentModal = function(id = null) {
         document.getElementById('form-nom-comu').value = item.nom_comu || '';
         document.getElementById('form-nom-cientific').value = item.nom_cientific || '';
         document.getElementById('form-tipologia').value = item.tipologia || 'planta_silvestre';
-        document.getElementById('form-color').value = item.color || '#b6d7a8';
         document.getElementById('form-composicio').value = item.composicio || '';
 
+        // Seleccionar color net
+        selectedFormColor = item.color || '#b6d7a8';
+        document.querySelectorAll('.color-option-circle').forEach(circle => {
+            if (circle.getAttribute('data-color') === selectedFormColor) {
+                circle.classList.add('active');
+            } else {
+                circle.classList.remove('active');
+            }
+        });
+
         if (item.parts) {
-            document.querySelectorAll('#parts-checkboxes input').forEach(cb => {
-                if (item.parts.includes(cb.value)) cb.checked = true;
-            });
+            item.parts.forEach(p => addChipOption('parts-checkboxes', p, true));
         }
 
         if (item.consum) {
-            document.querySelectorAll('#consum-checkboxes input').forEach(cb => {
-                if (item.consum.includes(cb.value)) cb.checked = true;
-            });
+            item.consum.forEach(c => addChipOption('consum-checkboxes', c, true));
         }
 
         if (item.mesos) {
@@ -401,6 +474,11 @@ window.openAlimentModal = function(id = null) {
         }
     } else {
         alimentModalTitle.textContent = 'Nou Aliment';
+        selectedFormColor = '#b6d7a8';
+        document.querySelectorAll('.color-option-circle').forEach((c, idx) => {
+            if (idx === 0) c.classList.add('active');
+            else c.classList.remove('active');
+        });
         addImageInputField();
     }
     alimentModal.classList.remove('hidden');
@@ -423,7 +501,8 @@ async function handleAlimentFormSubmit(e) {
     const nom_comu = document.getElementById('form-nom-comu').value.trim();
     const nom_cientific = document.getElementById('form-nom-cientific').value.trim();
     const tipologia = document.getElementById('form-tipologia').value;
-    const color = document.getElementById('form-color').value;
+    
+    const color = selectedFormColor;
     const composicio = document.getElementById('form-composicio').value.trim();
 
     const parts = Array.from(document.querySelectorAll('#parts-checkboxes input:checked')).map(cb => cb.value);

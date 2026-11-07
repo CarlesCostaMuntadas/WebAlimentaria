@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alimentalia - Catàleg Natural</title>
+    <title>Alimentalia</title>
     <link rel="stylesheet" href="styles.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -13,20 +13,15 @@
         <div class="header-container">
             <div class="logo-wrapper">
                 <svg class="icon-svg" viewBox="0 0 24 24"><path d="M17.5 3C15.5 3 13 4.5 11 6.5C9 4.5 6.5 3 4.5 3C2 3 0 5 0 7.5C0 12 5 17 11 21C17 17 22 12 22 7.5C22 5 20 3 17.5 3Z"/></svg>
-                <h1 id="main-title">Alimentalia</h1>
+                <h1>Alimentalia</h1>
             </div>
-            <p id="main-subtitle">Catàleg natural d'aliments, plantes silvestres, verdures, fruites, peixos i marisc</p>
+            <p id="main-subtitle">Catàleg de...</p>
         </div>
     </header>
 
-    <!-- Navegació per Tipologies amb comptadors dinàmics -->
+    <!-- Navegació per Tipologies dinàmica segons BBDD (només publicats) -->
     <nav class="categories-nav" id="categories-nav">
-        <button class="tab-btn active" data-tipologia="tots">Tots (<span id="count-tots">0</span>)</button>
-        <button class="tab-btn" data-tipologia="planta_silvestre">Plantes Silvestres (<span id="count-planta_silvestre">0</span>)</button>
-        <button class="tab-btn" data-tipologia="verdura">Verdures (<span id="count-verdura">0</span>)</button>
-        <button class="tab-btn" data-tipologia="fruita">Fruites (<span id="count-fruita">0</span>)</button>
-        <button class="tab-btn" data-tipologia="peix">Peixos (<span id="count-peix">0</span>)</button>
-        <button class="tab-btn" data-tipologia="marisc">Marisc (<span id="count-marisc">0</span>)</button>
+        <!-- Generat dinàmicament per JS -->
     </nav>
 
     <main class="main-container">
@@ -60,14 +55,14 @@
                     </div>
                 </div>
 
-                <!-- Proximitat amb text clar en lloc de codis hexadecimals -->
+                <!-- Proximitat amb colors visuals -->
                 <div class="filter-group">
                     <label>Proximitat (Osona):</label>
                     <div class="color-filter-buttons">
                         <button class="color-btn" data-color="tots" title="Tots">Tots</button>
-                        <button class="color-btn active" data-color="#b6d7a8" title="Alta proximitat">Verd (Alta)</button>
-                        <button class="color-btn" data-color="#f9cb9c" title="Proximitat moderada">Taronja (Moderada)</button>
-                        <button class="color-btn" data-color="#ea9999" title="Baixa proximitat">Vermell (Baixa)</button>
+                        <button class="color-btn active" data-color="#b6d7a8" style="background-color: #b6d7a8;" title="Alta proximitat"></button>
+                        <button class="color-btn" data-color="#f9cb9c" style="background-color: #f9cb9c;" title="Moderada"></button>
+                        <button class="color-btn" data-color="#ea9999" style="background-color: #ea9999;" title="Baixa proximitat"></button>
                     </div>
                 </div>
 
@@ -159,13 +154,14 @@
                             <option value="marisc">Marisc</option>
                         </select>
                     </div>
+                    <!-- Proximitat amb selecció de color neta (cercles interactius) -->
                     <div class="form-group">
-                        <label>Proximitat (Osona):</label>
-                        <select id="form-color">
-                            <option value="#b6d7a8">Verd (Alta proximitat)</option>
-                            <option value="#f9cb9c">Taronja (Proximitat moderada)</option>
-                            <option value="#ea9999">Vermell (Baixa proximitat)</option>
-                        </select>
+                        <label>Proximitat (Color):</label>
+                        <div class="color-picker-clean" id="color-picker-group">
+                            <div class="color-option-circle active" data-color="#b6d7a8" style="background: #b6d7a8;" title="Verd (Alta)"></div>
+                            <div class="color-option-circle" data-color="#f9cb9c" style="background: #f9cb9c;" title="Taronja (Moderada)"></div>
+                            <div class="color-option-circle" data-color="#ea9999" style="background: #ea9999;" title="Vermell (Baixa)"></div>
+                        </div>
                     </div>
                 </div>
                 <div class="form-group">
@@ -187,6 +183,10 @@
                         <label class="chip-checkbox"><input type="checkbox" value="Carn"><span>Carn</span></label>
                         <label class="chip-checkbox"><input type="checkbox" value="Roseta basal"><span>Roseta basal</span></label>
                     </div>
+                    <div class="custom-add-wrapper">
+                        <input type="text" id="custom-part-input" placeholder="Afegir altra part...">
+                        <button type="button" id="btn-add-custom-part" class="btn-secondary-sm">+ Afegir</button>
+                    </div>
                 </div>
 
                 <div class="form-group">
@@ -196,6 +196,10 @@
                         <label class="chip-checkbox"><input type="checkbox" value="Cuit"><span>Cuit</span></label>
                         <label class="chip-checkbox"><input type="checkbox" value="Infusionat"><span>Infusionat</span></label>
                         <label class="chip-checkbox"><input type="checkbox" value="Sec"><span>Sec</span></label>
+                    </div>
+                    <div class="custom-add-wrapper">
+                        <input type="text" id="custom-consum-input" placeholder="Afegir altre consum...">
+                        <button type="button" id="btn-add-custom-consum" class="btn-secondary-sm">+ Afegir</button>
                     </div>
                 </div>
 
@@ -230,11 +234,14 @@
         </div>
     </div>
 
-    <!-- Modal per veure imatge en gran -->
-    <div id="image-modal" class="modal hidden" onclick="this.classList.add('hidden')">
+    <!-- Modal per veure imatge en gran amb navegació -->
+    <div id="image-modal" class="modal hidden" onclick="closeImageModal()">
         <div class="image-modal-content" onclick="event.stopPropagation()">
-            <span class="close" onclick="document.getElementById('image-modal').classList.add('hidden')">&times;</span>
+            <span class="close" onclick="closeImageModal()">&times;</span>
+            <button class="modal-nav-btn modal-prev" id="modal-prev-btn" onclick="slideModalImage(-1)">&#10094;</button>
             <img id="modal-img-preview" src="" alt="Imatge ampliada">
+            <button class="modal-nav-btn modal-next" id="modal-next-btn" onclick="slideModalImage(1)">&#10095;</button>
+            <div class="modal-counter" id="modal-img-counter">1 / 1</div>
         </div>
     </div>
 

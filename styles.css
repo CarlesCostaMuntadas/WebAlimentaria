@@ -41,14 +41,13 @@ body { background-color: var(--bg-color); color: var(--text-color); line-height:
 .checkbox-item { display: flex; align-items: center; gap: 0.4rem; padding: 0.25rem 0.4rem; font-weight: normal; font-size: 0.85rem; cursor: pointer; }
 .checkbox-item:hover { background-color: #f7fafc; }
 
-/* Botons de proximitat adaptats amb text descriptiu */
-.color-filter-buttons { display: flex; gap: 0.4rem; flex-wrap: wrap; }
-.color-btn { padding: 0.35rem 0.8rem; border-radius: 15px; border: 1px solid #cbd5e0; background: white; cursor: pointer; font-size: 0.8rem; font-weight: 600; color: #4a5568; transition: all 0.2s; }
-.color-btn.active { border-color: var(--primary-color); background-color: var(--primary-color); color: white; }
+.color-filter-buttons { display: flex; gap: 0.4rem; }
+.color-btn { width: 28px; height: 28px; border-radius: 50%; border: 2px solid transparent; cursor: pointer; }
+.color-btn.active { border-color: #2b2b2b; transform: scale(1.15); }
+.color-btn[data-color="tots"] { background: #e2e8f0; font-size: 0.7rem; font-weight: bold; color: #4a5568; display: flex; align-items: center; justify-content: center; }
 
 select { padding: 0.4rem 0.6rem; border-radius: 6px; border: 1px solid #cbd5e0; }
 
-/* Panell d'Administració refinat */
 .admin-panel { background-color: #fffbeb; border: 1px solid #fef3c7; padding: 1.2rem; border-radius: 10px; margin-bottom: 1.5rem; display: flex; flex-direction: column; gap: 0.8rem; }
 .admin-panel.hidden { display: none; }
 .admin-header { display: flex; justify-content: space-between; width: 100%; align-items: center; }
@@ -56,16 +55,23 @@ select { padding: 0.4rem 0.6rem; border-radius: 6px; border: 1px solid #cbd5e0; 
 .admin-top-actions { display: flex; gap: 0.6rem; align-items: center; }
 .admin-actions { display: flex; gap: 0.6rem; width: 100%; }
 
-/* Mides i estils harmonitzats per als botons d'admin */
 .btn-admin-action { padding: 0.45rem 1rem; border-radius: 6px; font-weight: 600; font-size: 0.85rem; cursor: pointer; border: none; }
 .btn-success { background: var(--success-color); color: white; padding: 0.45rem 1rem; border-radius: 6px; font-weight: 600; font-size: 0.85rem; border: none; cursor: pointer; }
 .btn-warning { background: #f59e0b; color: white; padding: 0.45rem 1rem; border-radius: 6px; font-weight: 600; font-size: 0.85rem; border: none; cursor: pointer; }
 .btn-danger { background: var(--danger-color); color: white; padding: 0.45rem 1rem; border-radius: 6px; font-weight: 600; font-size: 0.85rem; border: none; cursor: pointer; }
 .btn-danger-sm { background: var(--danger-color); color: white; border: none; padding: 0.3rem 0.6rem; border-radius: 4px; cursor: pointer; font-size: 0.8rem; }
 .btn-info { background: #3182ce; color: white; border: none; padding: 0.3rem 0.6rem; border-radius: 4px; cursor: pointer; font-weight: 600; }
-.btn-secondary-sm { background: #e2e8f0; color: #2d3748; border: none; padding: 0.3rem 0.6rem; border-radius: 4px; cursor: pointer; font-size: 0.8rem; font-weight: 600; }
+.btn-secondary-sm { background: #e2e8f0; color: #2d3748; border: none; padding: 0.4rem 0.8rem; border-radius: 6px; cursor: pointer; font-size: 0.85rem; font-weight: 600; }
 
-/* GRAELLA I TARGETES */
+/* Selector de color net i directe (cercles interactius) */
+.color-picker-clean { display: flex; gap: 10px; align-items: center; padding: 6px 0; }
+.color-option-circle { width: 32px; height: 32px; border-radius: 50%; border: 2px solid #cbd5e0; cursor: pointer; transition: transform 0.2s, border-color 0.2s; }
+.color-option-circle:hover { transform: scale(1.1); }
+.color-option-circle.active { border-color: #2b2b2b; transform: scale(1.15); box-shadow: 0 0 0 2px rgba(44,94,59,0.2); }
+
+.custom-add-wrapper { display: flex; gap: 8px; margin-top: 8px; }
+.custom-add-wrapper input { flex: 1; padding: 0.4rem 0.6rem; font-size: 0.85rem; border: 1px solid #cbd5e0; border-radius: 6px; }
+
 .aliments-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem; }
 .aliment-card { background-color: var(--card-bg); border-radius: 16px; border: 1px solid #e2e8f0; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 2px 6px rgba(0,0,0,0.02); position: relative; }
 .aliment-card.despublicat { opacity: 0.5; }
@@ -100,8 +106,7 @@ select { padding: 0.4rem 0.6rem; border-radius: 6px; border: 1px solid #cbd5e0; 
 .site-footer { text-align: center; padding: 2rem 1rem; color: #a0aec0; font-size: 0.85rem; margin-top: 3rem; border-top: 1px solid #edf2f7; }
 .btn-discreet { background: none; border: none; color: #cbd5e0; font-size: 0.75rem; cursor: pointer; margin-top: 0.5rem; text-decoration: underline; }
 
-/* XIPS INTERACTIUS NETS */
-.options-chips-grid { display: flex; flex-wrap: wrap; gap: 8px; background: #f8faf8; padding: 12px; border-radius: 10px; border: 1px solid #e2e8f0; }
+.options-chips-grid { display: flex; flex-wrap: wrap; gap: 8px; background: #f8faf8; padding: 12px; border-radius: 10px; border: 1px solid #e2e8f0; max-height: 150px; overflow-y: auto; }
 .chip-checkbox { display: inline-flex; align-items: center; padding: 6px 12px; background: #ffffff; border: 1px solid #cbd5e0; border-radius: 20px; font-size: 0.85rem; font-weight: 500; color: #4a5568; cursor: pointer; transition: all 0.2s ease; user-select: none; }
 .chip-checkbox input { display: none; }
 .chip-checkbox input:checked + span { color: #166534; }
@@ -111,7 +116,6 @@ select { padding: 0.4rem 0.6rem; border-radius: 6px; border: 1px solid #cbd5e0; 
 .image-input-row { display: flex; gap: 8px; align-items: center; }
 .image-input-row input { flex: 1; }
 
-/* TOASTS */
 .toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; max-width: 350px; }
 .toast { background: white; padding: 12px 18px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); font-size: 0.9rem; display: flex; align-items: center; justify-content: space-between; gap: 12px; border-left: 5px solid #3182ce; animation: slideIn 0.3s ease; }
 .toast.success { border-left-color: var(--success-color); }
@@ -119,16 +123,19 @@ select { padding: 0.4rem 0.6rem; border-radius: 6px; border: 1px solid #cbd5e0; 
 .toast.warning { border-left-color: #f59e0b; }
 @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
 
-/* Modals */
 .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); display: flex; justify-content: center; align-items: center; z-index: 1000; backdrop-filter: blur(2px); }
 .modal.hidden { display: none; }
 .modal-content { background: white; padding: 2rem; border-radius: 12px; width: 340px; position: relative; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
 .modal-large { width: 720px; max-width: 95%; max-height: 90vh; overflow-y: auto; }
 
-/* Modal Imatge Gran */
 .image-modal-content { background: transparent; padding: 0; position: relative; max-width: 90vw; max-height: 90vh; display: flex; justify-content: center; align-items: center; }
 .image-modal-content img { max-width: 100%; max-height: 85vh; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); object-fit: contain; }
-.image-modal-content .close { position: absolute; top: -40px; right: 0; color: white; font-size: 2rem; }
+.modal-nav-btn { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.6); color: white; border: none; width: 44px; height: 44px; border-radius: 50%; cursor: pointer; font-size: 1.5rem; display: flex; align-items: center; justify-content: center; z-index: 1010; transition: background 0.2s; }
+.modal-nav-btn:hover { background: rgba(0,0,0,0.8); }
+.modal-prev { left: -60px; }
+.modal-next { right: -60px; }
+.modal-counter { position: absolute; bottom: -35px; color: white; font-size: 0.9rem; font-weight: 600; background: rgba(0,0,0,0.5); padding: 4px 12px; border-radius: 12px; }
+.image-modal-content .close { position: absolute; top: -45px; right: 0; color: white; font-size: 2rem; }
 
 .close { position: absolute; top: 1rem; right: 1rem; cursor: pointer; font-size: 1.3rem; color: #a0aec0; }
 .form-group { margin-bottom: 1rem; }
