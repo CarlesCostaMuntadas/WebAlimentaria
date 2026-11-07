@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alimentalia - Catàleg Natural</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+    <header class="site-header">
+        <div class="header-container">
+            <div class="logo-wrapper">
+                <svg class="icon-svg" viewBox="0 0 24 24"><path d="M17.5 3C15.5 3 13 4.5 11 6.5C9 4.5 6.5 3 4.5 3C2 3 0 5 0 7.5C0 12 5 17 11 21C17 17 22 12 22 7.5C22 5 20 3 17.5 3Z"/></svg>
+                <h1 id="main-title">Alimentalia</h1>
+            </div>
+            <p id="main-subtitle">Catàleg natural d'aliments, plantes silvestres, verdures, fruites, peixos i marisc</p>
+        </div>
+    </header>
+
+    <!-- Navegació per Tipologies amb comptadors dinàmics -->
+    <nav class="categories-nav" id="categories-nav">
+        <button class="tab-btn active" data-tipologia="tots">Tots (<span id="count-tots">0</span>)</button>
+        <button class="tab-btn" data-tipologia="planta_silvestre">Plantes Silvestres (<span id="count-planta_silvestre">0</span>)</button>
+        <button class="tab-btn" data-tipologia="verdura">Verdures (<span id="count-verdura">0</span>)</button>
+        <button class="tab-btn" data-tipologia="fruita">Fruites (<span id="count-fruita">0</span>)</button>
+        <button class="tab-btn" data-tipologia="peix">Peixos (<span id="count-peix">0</span>)</button>
+        <button class="tab-btn" data-tipologia="marisc">Marisc (<span id="count-marisc">0</span>)</button>
+    </nav>
+
+    <main class="main-container">
+        <div class="filters-section">
+            <div class="search-bar-wrapper">
+                <svg class="search-icon" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+                <input type="text" id="search-input" placeholder="Cerca per nom comú o científic...">
+            </div>
+
+            <div class="secondary-filters">
+                <div class="filter-group">
+                    <label>Mesos de temporada:</label>
+                    <div class="dropdown-multi" id="months-dropdown">
+                        <button class="dropdown-toggle" id="months-toggle-btn">Seleccionar mesos (<span id="selected-months-count">1</span>)</button>
+                        <div class="dropdown-menu hidden" id="months-menu">
+                            <label class="checkbox-item"><input type="checkbox" id="check-all-months"> <strong>Tots els mesos</strong></label>
+                            <hr>
+                            <label class="checkbox-item"><input type="checkbox" class="month-check" value="Gener"> Gener</label>
+                            <label class="checkbox-item"><input type="checkbox" class="month-check" value="Febrer"> Febrer</label>
+                            <label class="checkbox-item"><input type="checkbox" class="month-check" value="Març"> Març</label>
+                            <label class="checkbox-item"><input type="checkbox" class="month-check" value="Abril"> Abril</label>
+                            <label class="checkbox-item"><input type="checkbox" class="month-check" value="Maig"> Maig</label>
+                            <label class="checkbox-item"><input type="checkbox" class="month-check" value="Juny"> Juny</label>
+                            <label class="checkbox-item"><input type="checkbox" class="month-check" value="Juliol"> Juliol</label>
+                            <label class="checkbox-item"><input type="checkbox" class="month-check" value="Agost"> Agost</label>
+                            <label class="checkbox-item"><input type="checkbox" class="month-check" value="Setembre"> Setembre</label>
+                            <label class="checkbox-item"><input type="checkbox" class="month-check" value="Octubre"> Octubre</label>
+                            <label class="checkbox-item"><input type="checkbox" class="month-check" value="Novembre"> Novembre</label>
+                            <label class="checkbox-item"><input type="checkbox" class="month-check" value="Desembre"> Desembre</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Proximitat amb text clar en lloc de codis hexadecimals -->
+                <div class="filter-group">
+                    <label>Proximitat (Osona):</label>
+                    <div class="color-filter-buttons">
+                        <button class="color-btn" data-color="tots" title="Tots">Tots</button>
+                        <button class="color-btn active" data-color="#b6d7a8" title="Alta proximitat">Verd (Alta)</button>
+                        <button class="color-btn" data-color="#f9cb9c" title="Proximitat moderada">Taronja (Moderada)</button>
+                        <button class="color-btn" data-color="#ea9999" title="Baixa proximitat">Vermell (Baixa)</button>
+                    </div>
+                </div>
+
+                <div class="filter-group">
+                    <label for="items-per-page">Per pàgina:</label>
+                    <select id="items-per-page">
+                        <option value="12">12</option>
+                        <option value="24" selected>24</option>
+                        <option value="48">48</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div id="admin-panel" class="admin-panel hidden">
+            <div class="admin-header">
+                <div class="admin-title-wrap">
+                    <svg class="icon-svg-sm" viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+                    <h2>Panell d'Administració</h2>
+                </div>
+                <div class="admin-top-actions">
+                    <button id="btn-nou-aliment" class="btn-admin-action btn-success">Nou Aliment</button>
+                    <button id="btn-admin-logout" class="btn-admin-action btn-danger">Tancar Sessió</button>
+                </div>
+            </div>
+            <div class="admin-actions">
+                <button id="btn-massiu-despublicar" class="btn-warning">Despublicar categoria</button>
+                <button id="btn-massiu-publicar" class="btn-success">Publicar categoria</button>
+            </div>
+        </div>
+
+        <div id="aliments-grid" class="aliments-grid"></div>
+
+        <div class="pagination-wrapper" id="pagination-container">
+            <button id="btn-prev-page" class="btn-page">&laquo; Anterior</button>
+            <span id="page-info">Pàgina 1 de 1</span>
+            <button id="btn-next-page" class="btn-page">Següent &raquo;</button>
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        <p>&copy; Alimentalia - Catàleg Natural de Proximitat</p>
+        <button id="btn-admin-login-discreet" class="btn-discreet">Accés Admin</button>
+    </footer>
+
+    <div id="login-modal" class="modal hidden">
+        <div class="modal-content">
+            <span id="close-modal" class="close">&times;</span>
+            <h2>Accés Administrador</h2>
+            <form id="login-form">
+                <div class="form-group">
+                    <label>Correu electrònic:</label>
+                    <input type="email" id="login-email" required>
+                </div>
+                <div class="form-group">
+                    <label>Contrasenya:</label>
+                    <input type="password" id="login-password" required>
+                </div>
+                <button type="submit" class="btn-primary">Entrar</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal CRUD -->
+    <div id="aliment-modal" class="modal hidden">
+        <div class="modal-content modal-large">
+            <span id="close-aliment-modal" class="close">&times;</span>
+            <h2 id="aliment-modal-title">Nou Aliment</h2>
+            <form id="aliment-form">
+                <input type="hidden" id="aliment-id">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Nom comú:</label>
+                        <input type="text" id="form-nom-comu" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Nom científic:</label>
+                        <input type="text" id="form-nom-cientific" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Tipologia:</label>
+                        <select id="form-tipologia">
+                            <option value="planta_silvestre">Planta Silvestre</option>
+                            <option value="verdura">Verdura</option>
+                            <option value="fruita">Fruita</option>
+                            <option value="peix">Peix</option>
+                            <option value="marisc">Marisc</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Proximitat (Osona):</label>
+                        <select id="form-color">
+                            <option value="#b6d7a8">Verd (Alta proximitat)</option>
+                            <option value="#f9cb9c">Taronja (Proximitat moderada)</option>
+                            <option value="#ea9999">Vermell (Baixa proximitat)</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Composició / Propietats:</label>
+                    <textarea id="form-composicio" rows="2"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Parts emprades:</label>
+                    <div class="options-chips-grid" id="parts-checkboxes">
+                        <label class="chip-checkbox"><input type="checkbox" value="Fulla"><span>Fulla</span></label>
+                        <label class="chip-checkbox"><input type="checkbox" value="Flor"><span>Flor</span></label>
+                        <label class="chip-checkbox"><input type="checkbox" value="Fruit"><span>Fruit</span></label>
+                        <label class="chip-checkbox"><input type="checkbox" value="Tija"><span>Tija</span></label>
+                        <label class="chip-checkbox"><input type="checkbox" value="Arrel"><span>Arrel</span></label>
+                        <label class="chip-checkbox"><input type="checkbox" value="Brot"><span>Brot</span></label>
+                        <label class="chip-checkbox"><input type="checkbox" value="Llavor"><span>Llavor</span></label>
+                        <label class="chip-checkbox"><input type="checkbox" value="Bulb"><span>Bulb</span></label>
+                        <label class="chip-checkbox"><input type="checkbox" value="Carn"><span>Carn</span></label>
+                        <label class="chip-checkbox"><input type="checkbox" value="Roseta basal"><span>Roseta basal</span></label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Forma de consum:</label>
+                    <div class="options-chips-grid" id="consum-checkboxes">
+                        <label class="chip-checkbox"><input type="checkbox" value="Cru"><span>Cru</span></label>
+                        <label class="chip-checkbox"><input type="checkbox" value="Cuit"><span>Cuit</span></label>
+                        <label class="chip-checkbox"><input type="checkbox" value="Infusionat"><span>Infusionat</span></label>
+                        <label class="chip-checkbox"><input type="checkbox" value="Sec"><span>Sec</span></label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Mesos de temporada:</label>
+                    <div class="options-chips-grid" id="mesos-checkboxes">
+                        <label class="chip-checkbox"><input type="checkbox" value="Gener"><span>Gener</span></label>
+                        <label class="chip-checkbox"><input type="checkbox" value="Febrer"><span>Febrer</span></label>
+                        <label class="chip-checkbox"><input type="checkbox" value="Març"><span>Març</span></label>
+                        <label class="chip-checkbox"><input type="checkbox" value="Abril"><span>Abril</span></label>
+                        <label class="chip-checkbox"><input type="checkbox" value="Maig"><span>Maig</span></label>
+                        <label class="chip-checkbox"><input type="checkbox" value="Juny"><span>Juny</span></label>
+                        <label class="chip-checkbox"><input type="checkbox" value="Juliol"><span>Juliol</span></label>
+                        <label class="chip-checkbox"><input type="checkbox" value="Agost"><span>Agost</span></label>
+                        <label class="chip-checkbox"><input type="checkbox" value="Setembre"><span>Setembre</span></label>
+                        <label class="chip-checkbox"><input type="checkbox" value="Octubre"><span>Octubre</span></label>
+                        <label class="chip-checkbox"><input type="checkbox" value="Novembre"><span>Novembre</span></label>
+                        <label class="chip-checkbox"><input type="checkbox" value="Desembre"><span>Desembre</span></label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>URLs d'imatges (opcionals):</label>
+                    <div id="image-inputs-container" style="display:flex; flex-direction:column; gap:8px; margin-bottom:8px;"></div>
+                    <button type="button" id="btn-add-image-field" class="btn-secondary-sm">+ Afegir URL d'imatge</button>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn-primary">Guardar Aliment</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal per veure imatge en gran -->
+    <div id="image-modal" class="modal hidden" onclick="this.classList.add('hidden')">
+        <div class="image-modal-content" onclick="event.stopPropagation()">
+            <span class="close" onclick="document.getElementById('image-modal').classList.add('hidden')">&times;</span>
+            <img id="modal-img-preview" src="" alt="Imatge ampliada">
+        </div>
+    </div>
+
+    <div id="toast-container" class="toast-container"></div>
+
+    <script src="script.js"></script>
+</body>
+</html>

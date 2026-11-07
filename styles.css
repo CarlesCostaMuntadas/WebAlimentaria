@@ -1,0 +1,141 @@
+:root {
+    --primary-color: #2c5e3b;
+    --primary-light: #3a7d4d;
+    --secondary-color: #f4f8f5;
+    --text-color: #2b2b2b;
+    --bg-color: #f8faf8;
+    --card-bg: #ffffff;
+    --danger-color: #bc4749;
+    --success-color: #38b000;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
+body { background-color: var(--bg-color); color: var(--text-color); line-height: 1.5; }
+
+.icon-svg { width: 32px; height: 32px; fill: currentColor; display: inline-block; vertical-align: middle; }
+.icon-svg-sm { width: 18px; height: 18px; fill: currentColor; display: inline-block; vertical-align: middle; margin-right: 6px; }
+
+.site-header { background: linear-gradient(135deg, var(--primary-color), var(--primary-light)); color: white; padding: 2rem 1rem 1.5rem; text-align: center; }
+.logo-wrapper { display: flex; align-items: center; justify-content: center; gap: 0.5rem; }
+.header-container h1 { font-size: 2.2rem; font-weight: 700; }
+.header-container p { font-size: 1rem; opacity: 0.9; margin-top: 0.3rem; }
+
+.categories-nav { display: flex; justify-content: center; gap: 0.5rem; background: white; padding: 0.8rem; flex-wrap: wrap; box-shadow: 0 2px 6px rgba(0,0,0,0.04); position: sticky; top: 0; z-index: 100; }
+.tab-btn { background: var(--secondary-color); border: none; padding: 0.4rem 1rem; font-size: 0.9rem; cursor: pointer; border-radius: 18px; font-weight: 600; color: #4a5568; transition: all 0.2s; }
+.tab-btn.active, .tab-btn:hover { background-color: var(--primary-color); color: white; }
+
+.main-container { max-width: 1200px; margin: 1.5rem auto; padding: 0 1rem; }
+
+.filters-section { background: white; padding: 1.2rem; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.03); margin-bottom: 1.5rem; }
+.search-bar-wrapper { position: relative; margin-bottom: 1rem; }
+.search-icon { position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); width: 18px; height: 18px; fill: #a0aec0; }
+#search-input { width: 100%; padding: 0.75rem 1rem 0.75rem 2.8rem; font-size: 0.95rem; border: 1px solid #e2e8f0; border-radius: 25px; outline: none; }
+
+.secondary-filters { display: flex; flex-wrap: wrap; gap: 1.5rem; align-items: center; justify-content: space-between; }
+.filter-group { display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem; font-weight: 600; color: #4a5568; }
+
+.dropdown-multi { position: relative; }
+.dropdown-toggle { background: white; border: 1px solid #cbd5e0; padding: 0.4rem 0.8rem; border-radius: 6px; cursor: pointer; font-size: 0.85rem; }
+.dropdown-menu { position: absolute; top: 100%; left: 0; background: white; border: 1px solid #cbd5e0; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); padding: 0.5rem; z-index: 200; width: 180px; max-height: 250px; overflow-y: auto; }
+.dropdown-menu.hidden { display: none; }
+.checkbox-item { display: flex; align-items: center; gap: 0.4rem; padding: 0.25rem 0.4rem; font-weight: normal; font-size: 0.85rem; cursor: pointer; }
+.checkbox-item:hover { background-color: #f7fafc; }
+
+/* Botons de proximitat adaptats amb text descriptiu */
+.color-filter-buttons { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+.color-btn { padding: 0.35rem 0.8rem; border-radius: 15px; border: 1px solid #cbd5e0; background: white; cursor: pointer; font-size: 0.8rem; font-weight: 600; color: #4a5568; transition: all 0.2s; }
+.color-btn.active { border-color: var(--primary-color); background-color: var(--primary-color); color: white; }
+
+select { padding: 0.4rem 0.6rem; border-radius: 6px; border: 1px solid #cbd5e0; }
+
+/* Panell d'Administració refinat */
+.admin-panel { background-color: #fffbeb; border: 1px solid #fef3c7; padding: 1.2rem; border-radius: 10px; margin-bottom: 1.5rem; display: flex; flex-direction: column; gap: 0.8rem; }
+.admin-panel.hidden { display: none; }
+.admin-header { display: flex; justify-content: space-between; width: 100%; align-items: center; }
+.admin-title-wrap { display: flex; align-items: center; color: #92400e; font-weight: bold; }
+.admin-top-actions { display: flex; gap: 0.6rem; align-items: center; }
+.admin-actions { display: flex; gap: 0.6rem; width: 100%; }
+
+/* Mides i estils harmonitzats per als botons d'admin */
+.btn-admin-action { padding: 0.45rem 1rem; border-radius: 6px; font-weight: 600; font-size: 0.85rem; cursor: pointer; border: none; }
+.btn-success { background: var(--success-color); color: white; padding: 0.45rem 1rem; border-radius: 6px; font-weight: 600; font-size: 0.85rem; border: none; cursor: pointer; }
+.btn-warning { background: #f59e0b; color: white; padding: 0.45rem 1rem; border-radius: 6px; font-weight: 600; font-size: 0.85rem; border: none; cursor: pointer; }
+.btn-danger { background: var(--danger-color); color: white; padding: 0.45rem 1rem; border-radius: 6px; font-weight: 600; font-size: 0.85rem; border: none; cursor: pointer; }
+.btn-danger-sm { background: var(--danger-color); color: white; border: none; padding: 0.3rem 0.6rem; border-radius: 4px; cursor: pointer; font-size: 0.8rem; }
+.btn-info { background: #3182ce; color: white; border: none; padding: 0.3rem 0.6rem; border-radius: 4px; cursor: pointer; font-weight: 600; }
+.btn-secondary-sm { background: #e2e8f0; color: #2d3748; border: none; padding: 0.3rem 0.6rem; border-radius: 4px; cursor: pointer; font-size: 0.8rem; font-weight: 600; }
+
+/* GRAELLA I TARGETES */
+.aliments-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem; }
+.aliment-card { background-color: var(--card-bg); border-radius: 16px; border: 1px solid #e2e8f0; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 2px 6px rgba(0,0,0,0.02); position: relative; }
+.aliment-card.despublicat { opacity: 0.5; }
+.card-color-bar { height: 12px; width: 100%; }
+
+.card-header-img { height: 160px; background-color: #f8faf8; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+.card-header-img img { width: 100%; height: 100%; object-fit: cover; display: none; }
+.card-header-img img.active-slide { display: block; }
+.svg-placeholder { width: 80px; height: 80px; fill: var(--primary-color); opacity: 0.85; }
+
+.gallery-nav-btn { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.4); color: white; border: none; width: 28px; height: 28px; border-radius: 50%; cursor: pointer; font-size: 0.9rem; display: flex; align-items: center; justify-content: center; z-index: 5; }
+.gallery-prev { left: 8px; }
+.gallery-next { right: 8px; }
+.gallery-indicators { position: absolute; bottom: 8px; display: flex; gap: 4px; z-index: 5; }
+.gallery-dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(255,255,255,0.6); }
+.gallery-dot.active { background: white; transform: scale(1.2); }
+
+.aliment-card-content { padding: 1.2rem; display: flex; flex-direction: column; gap: 0.8rem; flex-grow: 1; }
+.card-title h3 { font-size: 1.35rem; font-weight: 700; color: #1a202c; line-height: 1.2; }
+.card-title i { font-size: 0.9rem; color: #718096; font-style: italic; display: block; margin-top: 0.2rem; }
+.card-section { font-size: 0.88rem; }
+.card-section-title { font-size: 0.75rem; font-weight: 700; color: var(--primary-color); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.3rem; }
+.badges-row { display: flex; flex-wrap: wrap; gap: 0.3rem; }
+
+.badge-green { background-color: #f0fdf4; color: #166534; border: 1px solid #bbf7d0; padding: 0.15rem 0.55rem; border-radius: 8px; font-size: 0.82rem; font-weight: 500; }
+.badge-yellow { background-color: #ffffff; color: #854d0e; border: 1px solid #fef08a; padding: 0.15rem 0.45rem; border-radius: 8px; font-size: 0.8rem; }
+.badge-yellow.active-month { background-color: #fef9c3; font-weight: 600; }
+
+.pagination-wrapper { display: flex; justify-content: center; align-items: center; gap: 1rem; margin-top: 2rem; padding: 1rem; }
+.btn-page { background: white; border: 1px solid #cbd5e0; padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer; font-weight: 600; }
+.btn-page:disabled { opacity: 0.4; cursor: not-allowed; }
+.site-footer { text-align: center; padding: 2rem 1rem; color: #a0aec0; font-size: 0.85rem; margin-top: 3rem; border-top: 1px solid #edf2f7; }
+.btn-discreet { background: none; border: none; color: #cbd5e0; font-size: 0.75rem; cursor: pointer; margin-top: 0.5rem; text-decoration: underline; }
+
+/* XIPS INTERACTIUS NETS */
+.options-chips-grid { display: flex; flex-wrap: wrap; gap: 8px; background: #f8faf8; padding: 12px; border-radius: 10px; border: 1px solid #e2e8f0; }
+.chip-checkbox { display: inline-flex; align-items: center; padding: 6px 12px; background: #ffffff; border: 1px solid #cbd5e0; border-radius: 20px; font-size: 0.85rem; font-weight: 500; color: #4a5568; cursor: pointer; transition: all 0.2s ease; user-select: none; }
+.chip-checkbox input { display: none; }
+.chip-checkbox input:checked + span { color: #166534; }
+.chip-checkbox:has(input:checked) { background-color: #f0fdf4; border-color: #bbf7d0; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+.chip-checkbox:hover { border-color: var(--primary-color); }
+
+.image-input-row { display: flex; gap: 8px; align-items: center; }
+.image-input-row input { flex: 1; }
+
+/* TOASTS */
+.toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; max-width: 350px; }
+.toast { background: white; padding: 12px 18px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); font-size: 0.9rem; display: flex; align-items: center; justify-content: space-between; gap: 12px; border-left: 5px solid #3182ce; animation: slideIn 0.3s ease; }
+.toast.success { border-left-color: var(--success-color); }
+.toast.error { border-left-color: var(--danger-color); }
+.toast.warning { border-left-color: #f59e0b; }
+@keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+/* Modals */
+.modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); display: flex; justify-content: center; align-items: center; z-index: 1000; backdrop-filter: blur(2px); }
+.modal.hidden { display: none; }
+.modal-content { background: white; padding: 2rem; border-radius: 12px; width: 340px; position: relative; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+.modal-large { width: 720px; max-width: 95%; max-height: 90vh; overflow-y: auto; }
+
+/* Modal Imatge Gran */
+.image-modal-content { background: transparent; padding: 0; position: relative; max-width: 90vw; max-height: 90vh; display: flex; justify-content: center; align-items: center; }
+.image-modal-content img { max-width: 100%; max-height: 85vh; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); object-fit: contain; }
+.image-modal-content .close { position: absolute; top: -40px; right: 0; color: white; font-size: 2rem; }
+
+.close { position: absolute; top: 1rem; right: 1rem; cursor: pointer; font-size: 1.3rem; color: #a0aec0; }
+.form-group { margin-bottom: 1rem; }
+.form-group label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.3rem; }
+.form-group input, .form-group select, .form-group textarea { width: 100%; padding: 0.6rem; border: 1px solid #cbd5e0; border-radius: 6px; font-size: 0.9rem; outline: none; }
+.form-group input:focus, .form-group textarea:focus, .form-group select:focus { border-color: var(--primary-color); }
+.form-row { display: flex; gap: 1rem; }
+.form-row .form-group { flex: 1; }
+.form-actions { margin-top: 1.5rem; text-align: right; }
+.btn-primary { background: var(--primary-color); color: white; border: none; padding: 0.7rem 1.5rem; border-radius: 6px; cursor: pointer; font-weight: 600; width: 100%; }
